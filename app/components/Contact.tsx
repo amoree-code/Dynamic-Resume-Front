@@ -54,10 +54,19 @@ export default function Contact({ user }: { user: User }) {
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 text-gray-500 hover:text-green-400 transition-colors text-sm font-mono group"
               >
-                <span className="text-green-900 group-hover:text-green-600 transition-colors">
-                  →
-                </span>
+                <span className="text-green-900 group-hover:text-green-600 transition-colors">→</span>
                 linkedin
+              </a>
+            )}
+            {user.instagram && (
+              <a
+                href={user.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 text-gray-500 hover:text-green-400 transition-colors text-sm font-mono group"
+              >
+                <span className="text-green-900 group-hover:text-green-600 transition-colors">→</span>
+                instagram
               </a>
             )}
           </div>

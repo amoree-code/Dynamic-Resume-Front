@@ -1,47 +1,25 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import {
-  fetchUser,
-  fetchSkills,
-  fetchProjects,
-  fetchExperience,
-  fetchEducation,
-} from './lib/api'
-import type { User, Skill, Project, Experience, Education } from './types'
-import Navbar from './components/Navbar'
-import Hero from './components/Hero'
-import Skills from './components/Skills'
-import Projects from './components/Projects'
-import ExperienceSection from './components/Experience'
-import EducationSection from './components/Education'
-import Contact from './components/Contact'
-
-interface PortfolioData {
-  user: User
-  skills: Skill[]
-  projects: Project[]
-  experience: Experience[]
-  education: Education[]
-}
+import { useEffect, useState } from 'react';
+import { fetchUser } from './lib/api';
+import type { User } from './types';
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import Skills from './components/Skills';
+import Projects from './components/Projects';
+import ExperienceSection from './components/Experience';
+import EducationSection from './components/Education';
+import Contact from './components/Contact';
 
 export default function Home() {
-  const [data, setData] = useState<PortfolioData | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [user, setUser] = useState<User | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([
-      fetchUser(),
-      fetchSkills(),
-      fetchProjects(),
-      fetchExperience(),
-      fetchEducation(),
-    ])
-      .then(([user, skills, projects, experience, education]) =>
-        setData({ user, skills, projects, experience, education }),
-      )
-      .catch((e: Error) => setError(e.message))
-  }, [])
+    fetchUser()
+      .then(setUser)
+      .catch((e: Error) => setError(e.message));
+  }, []);
 
   if (error) {
     return (
@@ -59,34 +37,34 @@ export default function Home() {
           </p>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!data) {
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <span className="text-green-900 font-mono text-sm animate-pulse tracking-widest">
           // initializing…
         </span>
       </div>
-    )
+    );
   }
 
   return (
     <>
-      <Navbar name={data.user.name} />
+      <Navbar name={user.name} />
       <main>
-        <Hero user={data.user} />
-        {data.skills.length > 0 && <Skills skills={data.skills} />}
-        {data.projects.length > 0 && <Projects projects={data.projects} />}
-        {data.experience.length > 0 && (
-          <ExperienceSection experience={data.experience} />
+        <Hero user={user} />
+        {(user.experience ?? []).length > 0 && (
+          <ExperienceSection experience={user.experience!} />
         )}
-        {data.education.length > 0 && (
-          <EducationSection education={data.education} />
+        {(user.projects ?? []).length > 0 && <Projects projects={user.projects!} />}
+        {(user.skills ?? []).length > 0 && <Skills skills={user.skills!} />}
+        {(user.education ?? []).length > 0 && (
+          <EducationSection education={user.education!} />
         )}
-        <Contact user={data.user} />
+        <Contact user={user} />
       </main>
     </>
-  )
+  );
 }
