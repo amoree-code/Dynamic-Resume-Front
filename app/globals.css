@@ -1,26 +1,70 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── base ──────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: #0a0a0a;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #0a0a0a;
+  color: #f0f0f0;
+  font-family: var(--font-mono), 'Courier New', monospace;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ── subtle background grid ────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(34, 197, 94, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 197, 94, 0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── scrollbar ─────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #14532d;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #166534;
+}
+
+/* ── text selection ────────────────────────────────── */
+::selection {
+  background: #14532d;
+  color: #86efac;
+}
+
+/* ── nav z-index ───────────────────────────────────── */
+nav {
+  position: relative;
+  z-index: 50;
 }
