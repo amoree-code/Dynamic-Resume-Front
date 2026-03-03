@@ -1,5 +1,5 @@
-import type { Project } from '../types'
-import { SectionHeading } from './SectionHeading'
+import type { Project } from '../types';
+import { SectionHeading } from './SectionHeading';
 
 export default function Projects({ projects }: { projects: Project[] }) {
   return (
@@ -20,9 +20,34 @@ export default function Projects({ projects }: { projects: Project[] }) {
                 {p.title}
               </h3>
 
-              <p className="text-gray-500 text-sm leading-relaxed mb-5 flex-1">
-                {p.longDesc ?? p.description}
-              </p>
+              {p.description && (
+                <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                  {p.description}
+                </p>
+              )}
+
+              {p.longDesc && (
+                <>
+                  <div className="w-full h-px bg-green-900/20 mb-4" />
+                  <ul className="space-y-1 mb-5 flex-1">
+                    {p.longDesc
+                      .split('\n')
+                      .map((line) => line.replace(/^-\s*/, '').trim())
+                      .filter(Boolean)
+                      .map((line, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-2 text-gray-500 text-sm leading-relaxed"
+                        >
+                          <span className="text-green-800 mt-1 shrink-0">
+                            —
+                          </span>
+                          {line}
+                        </li>
+                      ))}
+                  </ul>
+                </>
+              )}
 
               <div className="flex flex-wrap gap-1.5 mb-5">
                 {p.techStack.map((t) => (
@@ -64,5 +89,5 @@ export default function Projects({ projects }: { projects: Project[] }) {
         </div>
       </div>
     </section>
-  )
+  );
 }

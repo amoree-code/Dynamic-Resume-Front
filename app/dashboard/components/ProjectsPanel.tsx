@@ -1,108 +1,178 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import {
-  fetchProjects, createProject, updateProject, deleteProject,
-} from '../../lib/api'
-import type { Project, ProjectInput } from '../../types'
-import { Modal, ConfirmDialog, Field, inputCls, textareaCls, FormActions } from './Modal'
+  fetchUser,
+  createProject,
+  updateProject,
+  deleteProject,
+} from '../../lib/api';
+import type { Project, ProjectInput } from '../../types';
+import {
+  Modal,
+  ConfirmDialog,
+  Field,
+  inputCls,
+  textareaCls,
+  FormActions,
+} from './Modal';
 
 const empty: ProjectInput = {
-  title: '', description: '', longDesc: '',
-  techStack: [], liveUrl: '', repoUrl: '', imageUrl: '',
-}
+  title: '',
+  description: '',
+  longDesc: '',
+  techStack: [],
+  liveUrl: '',
+  repoUrl: '',
+  imageUrl: '',
+};
 
 function ProjectForm({
   initial,
   onSave,
   onCancel,
 }: {
-  initial: ProjectInput
-  onSave: (data: ProjectInput) => Promise<void>
-  onCancel: () => void
+  initial: ProjectInput;
+  onSave: (data: ProjectInput) => Promise<void>;
+  onCancel: () => void;
 }) {
   const [form, setForm] = useState<ProjectInput & { techRaw: string }>({
     ...initial,
     techRaw: initial.techStack.join(', '),
-  })
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const f = (k: keyof ProjectInput, v: string) => setForm((p) => ({ ...p, [k]: v }))
+  const f = (k: keyof ProjectInput, v: string) =>
+    setForm((p) => ({ ...p, [k]: v }));
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
+    e.preventDefault();
+    setError('');
+    setLoading(true);
     try {
-      const { techRaw, ...rest } = form
-      await onSave({
+      const { techRaw, liveUrl, repoUrl, imageUrl, ...rest } = form;
+      const payload: ProjectInput = {
         ...rest,
-        techStack: techRaw.split(',').map((t) => t.trim()).filter(Boolean),
-      })
+        techStack: techRaw
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean),
+      };
+      if (liveUrl) payload.liveUrl = liveUrl;
+      if (repoUrl) payload.repoUrl = repoUrl;
+      if (imageUrl) payload.imageUrl = imageUrl;
+      await onSave(payload);
     } catch (err: unknown) {
-      setError((err as Error).message)
-      setLoading(false)
+      setError((err as Error).message);
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Field label="Title" required>
-        <input className={inputCls} value={form.title} onChange={(e) => f('title', e.target.value)} required />
+        <input
+          className={inputCls}
+          value={form.title}
+          onChange={(e) => f('title', e.target.value)}
+          required
+        />
       </Field>
       <Field label="Short description" required>
-        <textarea className={textareaCls} rows={2} value={form.description} onChange={(e) => f('description', e.target.value)} required />
+        <textarea
+          className={textareaCls}
+          rows={2}
+          value={form.description}
+          onChange={(e) => f('description', e.target.value)}
+        />
       </Field>
       <Field label="Full description">
-        <textarea className={textareaCls} rows={3} value={form.longDesc ?? ''} onChange={(e) => f('longDesc', e.target.value)} />
+        <textarea
+          className={textareaCls}
+          rows={3}
+          value={form.longDesc ?? ''}
+          onChange={(e) => f('longDesc', e.target.value)}
+        />
       </Field>
-      <Field label="Tech stack (comma separated)" required>
-        <input className={inputCls} value={form.techRaw} onChange={(e) => setForm((p) => ({ ...p, techRaw: e.target.value }))} placeholder="NestJS, React, PostgreSQL" required />
+      <Field label="Tech stack (comma separated)">
+        <input
+          className={inputCls}
+          value={form.techRaw}
+          onChange={(e) => setForm((p) => ({ ...p, techRaw: e.target.value }))}
+          placeholder="NestJS, React, PostgreSQL"
+        />
       </Field>
       <Field label="Live URL">
-        <input className={inputCls} type="url" value={form.liveUrl ?? ''} onChange={(e) => f('liveUrl', e.target.value)} placeholder="https://..." />
+        <input
+          className={inputCls}
+          type="url"
+          value={form.liveUrl ?? ''}
+          onChange={(e) => f('liveUrl', e.target.value)}
+          placeholder="https://..."
+        />
       </Field>
       <Field label="Repo URL">
-        <input className={inputCls} type="url" value={form.repoUrl ?? ''} onChange={(e) => f('repoUrl', e.target.value)} placeholder="https://github.com/..." />
+        <input
+          className={inputCls}
+          type="url"
+          value={form.repoUrl ?? ''}
+          onChange={(e) => f('repoUrl', e.target.value)}
+          placeholder="https://github.com/..."
+        />
       </Field>
       <Field label="Image URL">
-        <input className={inputCls} type="url" value={form.imageUrl ?? ''} onChange={(e) => f('imageUrl', e.target.value)} placeholder="https://..." />
+        <input
+          className={inputCls}
+          type="url"
+          value={form.imageUrl ?? ''}
+          onChange={(e) => f('imageUrl', e.target.value)}
+          placeholder="https://..."
+        />
       </Field>
       {error && <p className="text-red-400 text-xs font-mono">{error}</p>}
-      <FormActions loading={loading} onCancel={onCancel} submitLabel="save project" />
+      <FormActions
+        loading={loading}
+        onCancel={onCancel}
+        submitLabel="save project"
+      />
     </form>
-  )
+  );
 }
 
 export default function ProjectsPanel() {
-  const [items, setItems] = useState<Project[]>([])
-  const [loading, setLoading] = useState(true)
-  const [modal, setModal] = useState<'create' | Project | null>(null)
-  const [delTarget, setDelTarget] = useState<Project | null>(null)
-  const [delLoading, setDelLoading] = useState(false)
+  const [items, setItems] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [modal, setModal] = useState<'create' | Project | null>(null);
+  const [delTarget, setDelTarget] = useState<Project | null>(null);
+  const [delLoading, setDelLoading] = useState(false);
 
-  const reload = () => fetchProjects().then(setItems).finally(() => setLoading(false))
-  useEffect(() => { reload() }, [])
+  const reload = () =>
+    fetchUser()
+      .then((u) => setItems(u.projects ?? []))
+      .finally(() => setLoading(false));
+  useEffect(() => {
+    reload();
+  }, []);
 
   const handleSave = async (data: ProjectInput) => {
-    if (modal === 'create') await createProject(data)
-    else if (modal) await updateProject((modal as Project).id, data)
-    setModal(null)
-    reload()
-  }
+    if (modal === 'create') await createProject(data);
+    else if (modal) await updateProject((modal as Project).id, data);
+    setModal(null);
+    reload();
+  };
 
   const handleDelete = async () => {
-    if (!delTarget) return
-    setDelLoading(true)
+    if (!delTarget) return;
+    setDelLoading(true);
     try {
-      await deleteProject(delTarget.id)
-      setDelTarget(null)
-      reload()
+      await deleteProject(delTarget.id);
+      setDelTarget(null);
+      reload();
     } finally {
-      setDelLoading(false)
+      setDelLoading(false);
     }
-  }
+  };
 
   return (
     <>
@@ -117,7 +187,9 @@ export default function ProjectsPanel() {
       </div>
 
       {loading ? (
-        <p className="text-green-900 font-mono text-sm animate-pulse">loading…</p>
+        <p className="text-green-900 font-mono text-sm animate-pulse">
+          loading…
+        </p>
       ) : items.length === 0 ? (
         <p className="text-gray-700 font-mono text-sm">No projects yet.</p>
       ) : (
@@ -128,8 +200,12 @@ export default function ProjectsPanel() {
               className="border border-green-900/25 bg-[#0d0d0d] px-4 py-3 flex items-start justify-between gap-4 hover:border-green-900/40 transition-colors"
             >
               <div className="min-w-0">
-                <p className="text-gray-200 text-sm font-semibold truncate">{p.title}</p>
-                <p className="text-gray-600 text-xs font-mono mt-0.5 truncate">{p.techStack.join(' · ')}</p>
+                <p className="text-gray-200 text-sm font-semibold truncate">
+                  {p.title}
+                </p>
+                <p className="text-gray-600 text-xs font-mono mt-0.5 truncate">
+                  {p.techStack.join(' · ')}
+                </p>
               </div>
               <div className="flex gap-3 shrink-0">
                 <button
@@ -152,7 +228,11 @@ export default function ProjectsPanel() {
 
       {modal && (
         <Modal
-          title={modal === 'create' ? 'New Project' : `Edit: ${(modal as Project).title}`}
+          title={
+            modal === 'create'
+              ? 'New Project'
+              : `Edit: ${(modal as Project).title}`
+          }
           onClose={() => setModal(null)}
         >
           <ProjectForm
@@ -172,5 +252,5 @@ export default function ProjectsPanel() {
         />
       )}
     </>
-  )
+  );
 }

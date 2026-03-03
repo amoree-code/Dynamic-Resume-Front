@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import {
-  fetchExperience, createExperience, updateExperience, deleteExperience,
+  fetchUser, createExperience, updateExperience, deleteExperience,
 } from '../../lib/api'
 import type { Experience, ExperienceInput } from '../../types'
 import { Modal, ConfirmDialog, Field, inputCls, textareaCls, FormActions } from './Modal'
@@ -98,7 +98,7 @@ export default function ExperiencePanel() {
   const [delTarget, setDelTarget] = useState<Experience | null>(null)
   const [delLoading, setDelLoading] = useState(false)
 
-  const reload = () => fetchExperience().then(setItems).finally(() => setLoading(false))
+  const reload = () => fetchUser().then((u) => setItems(u.experiences ?? [])).finally(() => setLoading(false))
   useEffect(() => { reload() }, [])
 
   const handleSave = async (data: ExperienceInput) => {

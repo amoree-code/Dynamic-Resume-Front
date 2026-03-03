@@ -28,6 +28,26 @@ export default function Contact({ user }: { user: User }) {
             >
               {user.email}
             </a>
+            {(user.phone1 || user.phone2) && (
+              <div className="flex flex-col gap-2 mt-4">
+                {user.phone1 && (
+                  <a
+                    href={`tel:${user.phone1}`}
+                    className="text-gray-400 hover:text-green-400 transition-colors font-mono text-sm"
+                  >
+                    {user.phone1}
+                  </a>
+                )}
+                {user.phone2 && (
+                  <a
+                    href={`tel:${user.phone2}`}
+                    className="text-gray-400 hover:text-green-400 transition-colors font-mono text-sm"
+                  >
+                    {user.phone2}
+                  </a>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-4 min-w-[160px]">

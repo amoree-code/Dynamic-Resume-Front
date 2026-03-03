@@ -1,8 +1,5 @@
-'use client';
-
-import { useEffect, useState } from 'react';
+import type { Metadata } from 'next';
 import { fetchUser } from './lib/api';
-import type { User } from './types';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Skills from './components/Skills';
@@ -11,24 +8,39 @@ import ExperienceSection from './components/Experience';
 import EducationSection from './components/Education';
 import Contact from './components/Contact';
 
-export default function Home() {
-  const [user, setUser] = useState<User | null>(null);
-  const [error, setError] = useState<string | null>(null);
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const user = await fetchUser();
+    const title = user.title ? `${user.name} — ${user.title}` : user.name;
+    const description =
+      user.bio ??
+      `Portfolio of ${user.name}${user.title ? `, ${user.title}` : ''}.`;
+    return {
+      title,
+      description,
+      openGraph: { title, description },
+      twitter: { title, description },
+    };
+  } catch {
+    return {};
+  }
+}
 
-  useEffect(() => {
-    fetchUser()
-      .then(setUser)
-      .catch((e: Error) => setError(e.message));
-  }, []);
+export default async function Home() {
+  let user;
 
-  if (error) {
+  try {
+    user = await fetchUser();
+  } catch (e: unknown) {
     return (
       <div className="min-h-screen flex items-center justify-center px-6">
         <div className="text-center space-y-3">
           <p className="text-green-900 text-xs font-mono tracking-widest">
             // connection error
           </p>
-          <p className="text-red-500 font-mono text-sm">{error}</p>
+          <p className="text-red-500 font-mono text-sm">
+            {(e as Error).message}
+          </p>
           <p className="text-gray-700 text-xs font-mono">
             API:{' '}
             <span className="text-green-900">
@@ -40,28 +52,32 @@ export default function Home() {
     );
   }
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <span className="text-green-900 font-mono text-sm animate-pulse tracking-widest">
-          // initializing…
-        </span>
-      </div>
-    );
-  }
-
   return (
     <>
-      <Navbar name={user.name} />
+      <Navbar
+        name={user.name}
+        sections={
+          new Set([
+            'about',
+            ...((user.experiences ?? []).length > 0 ? ['experience'] : []),
+            ...((user.projects ?? []).length > 0 ? ['projects'] : []),
+            ...((user.skills ?? []).length > 0 ? ['skills'] : []),
+            ...((user.educations ?? []).length > 0 ? ['education'] : []),
+            'contact',
+          ])
+        }
+      />
       <main>
         <Hero user={user} />
-        {(user.experience ?? []).length > 0 && (
-          <ExperienceSection experience={user.experience!} />
+        {(user.experiences ?? []).length > 0 && (
+          <ExperienceSection experience={user.experiences!} />
         )}
-        {(user.projects ?? []).length > 0 && <Projects projects={user.projects!} />}
+        {(user.projects ?? []).length > 0 && (
+          <Projects projects={user.projects!} />
+        )}
         {(user.skills ?? []).length > 0 && <Skills skills={user.skills!} />}
-        {(user.education ?? []).length > 0 && (
-          <EducationSection education={user.education!} />
+        {(user.educations ?? []).length > 0 && (
+          <EducationSection education={user.educations!} />
         )}
         <Contact user={user} />
       </main>

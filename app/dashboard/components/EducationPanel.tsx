@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import {
-  fetchEducation, createEducation, updateEducation, deleteEducation,
+  fetchUser, createEducation, updateEducation, deleteEducation,
 } from '../../lib/api'
 import type { Education, EducationInput } from '../../types'
 import { Modal, ConfirmDialog, Field, inputCls, FormActions } from './Modal'
@@ -99,7 +99,7 @@ export default function EducationPanel() {
   const [delTarget, setDelTarget] = useState<Education | null>(null)
   const [delLoading, setDelLoading] = useState(false)
 
-  const reload = () => fetchEducation().then(setItems).finally(() => setLoading(false))
+  const reload = () => fetchUser().then((u) => setItems(u.educations ?? [])).finally(() => setLoading(false))
   useEffect(() => { reload() }, [])
 
   const handleSave = async (data: EducationInput) => {

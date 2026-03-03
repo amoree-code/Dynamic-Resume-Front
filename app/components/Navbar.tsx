@@ -1,27 +1,34 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 
 const LINKS = [
-  { href: '#about', label: 'about' },
-  { href: '#skills', label: 'skills' },
-  { href: '#projects', label: 'projects' },
-  { href: '#experience', label: 'experience' },
-  { href: '#education', label: 'education' },
-  { href: '#contact', label: 'contact' },
-]
+  { href: '#about', label: 'about', section: 'about' },
+  { href: '#skills', label: 'skills', section: 'skills' },
+  { href: '#projects', label: 'projects', section: 'projects' },
+  { href: '#experience', label: 'experience', section: 'experience' },
+  { href: '#education', label: 'education', section: 'education' },
+  { href: '#contact', label: 'contact', section: 'contact' },
+];
 
-export default function Navbar({ name }: { name: string }) {
-  const [scrolled, setScrolled] = useState(false)
-  const [open, setOpen] = useState(false)
+export default function Navbar({
+  name,
+  sections,
+}: {
+  name: string;
+  sections: Set<string>;
+}) {
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 30)
-    window.addEventListener('scroll', fn, { passive: true })
-    return () => window.removeEventListener('scroll', fn)
-  }, [])
+    const fn = () => setScrolled(window.scrollY > 30);
+    window.addEventListener('scroll', fn, { passive: true });
+    return () => window.removeEventListener('scroll', fn);
+  }, []);
 
-  const slug = name.toLowerCase().replace(/\s+/g, '.')
+  const slug = name.toLowerCase().replace(/\s+/g, '.');
+  const visibleLinks = LINKS.filter((l) => sections.has(l.section));
 
   return (
     <nav
@@ -41,7 +48,7 @@ export default function Navbar({ name }: { name: string }) {
 
         {/* desktop */}
         <div className="hidden md:flex items-center gap-8">
-          {LINKS.map((l) => (
+          {visibleLinks.map((l) => (
             <a
               key={l.href}
               href={l.href}
@@ -65,7 +72,7 @@ export default function Navbar({ name }: { name: string }) {
       {/* mobile menu */}
       {open && (
         <div className="md:hidden bg-[#0a0a0a]/98 border-b border-green-900/25 px-6 py-4 flex flex-col gap-4">
-          {LINKS.map((l) => (
+          {visibleLinks.map((l) => (
             <a
               key={l.href}
               href={l.href}
@@ -78,5 +85,5 @@ export default function Navbar({ name }: { name: string }) {
         </div>
       )}
     </nav>
-  )
+  );
 }

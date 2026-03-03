@@ -1,5 +1,5 @@
-import type { Metadata } from 'next'
 import { Geist_Mono } from 'next/font/google'
+import { baseMetadata, baseViewport } from './lib/metadata'
 import './globals.css'
 
 const mono = Geist_Mono({
@@ -7,10 +7,8 @@ const mono = Geist_Mono({
   subsets: ['latin'],
 })
 
-export const metadata: Metadata = {
-  title: 'Portfolio',
-  description: 'Developer portfolio',
-}
+export const metadata = baseMetadata
+export const viewport = baseViewport
 
 export default function RootLayout({
   children,

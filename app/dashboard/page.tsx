@@ -13,9 +13,9 @@ type Tab = 'profile' | 'projects' | 'skills' | 'experience' | 'education';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'profile', label: 'Profile' },
+  { id: 'experience', label: 'Experience' },
   { id: 'projects', label: 'Projects' },
   { id: 'skills', label: 'Skills' },
-  { id: 'experience', label: 'Experience' },
   { id: 'education', label: 'Education' },
 ];
 
@@ -34,7 +34,6 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen flex bg-[#0a0a0a]">
-      {/* ── sidebar ── */}
       <aside className="hidden md:flex flex-col w-52 shrink-0 border-r border-green-900/20 bg-[#0a0a0a]">
         <div className="px-5 py-5 border-b border-green-900/20">
           <p className="text-green-900 text-xs font-mono tracking-widest">
@@ -124,7 +123,7 @@ export default function DashboardPage() {
   const [authed, setAuthed] = useState<boolean | null>(null);
 
   useEffect(() => {
-    setAuthed(!!localStorage.getItem('_rt'));
+    setAuthed(!!localStorage.getItem('access_token'));
   }, []);
 
   if (authed === null) return null; // avoid flash

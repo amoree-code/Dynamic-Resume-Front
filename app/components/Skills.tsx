@@ -1,19 +1,19 @@
-import type { Skill } from '../types'
-import { SectionHeading } from './SectionHeading'
+import type { Skill } from '../types';
+import { SectionHeading } from './SectionHeading';
 
 export default function Skills({ skills }: { skills: Skill[] }) {
-  const categories = [...new Set(skills.map((s) => s.category))]
+  const categories = [...new Set(skills.map((s) => s.category))];
 
   return (
     <section id="skills" className="py-28 px-6">
       <div className="max-w-6xl mx-auto">
-        <SectionHeading index="// 01" title="Skills" />
+        <SectionHeading index="// 03" title="Skills" />
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {categories.map((cat) => {
             const catSkills = skills
               .filter((s) => s.category === cat)
-              .sort((a, b) => b.level - a.level)
+              .sort((a, b) => b.level - a.level);
 
             return (
               <div
@@ -43,10 +43,10 @@ export default function Skills({ skills }: { skills: Skill[] }) {
                   ))}
                 </div>
               </div>
-            )
+            );
           })}
         </div>
       </div>
     </section>
-  )
+  );
 }

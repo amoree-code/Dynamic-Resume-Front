@@ -17,11 +17,20 @@ export default function Hero({ user }: { user: User }) {
 
         <h1 className="text-5xl sm:text-7xl lg:text-8xl font-bold text-white mb-4 tracking-tight leading-none">
           {user.name}
+          {user.surname && (
+            <span className="text-green-500"> {user.surname}</span>
+          )}
         </h1>
 
         {user.title && (
-          <p className="text-green-500 font-mono text-xl mb-2 tracking-wide">
+          <p className="text-green-500 font-mono t  ext-xl mb-1 tracking-wide">
             {user.title}
+          </p>
+        )}
+
+        {user.subtitle && (
+          <p className="text-gray-500 font-mono text-sm mb-2 tracking-wide">
+            {user.subtitle}
           </p>
         )}
 
