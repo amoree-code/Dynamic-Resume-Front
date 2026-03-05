@@ -8,18 +8,36 @@ import ExperienceSection from './components/Experience';
 import EducationSection from './components/Education';
 import Contact from './components/Contact';
 
+export const revalidate = 3600;
+
 export async function generateMetadata(): Promise<Metadata> {
   try {
     const user = await fetchUser();
-    const title = user.title ? `${user.name} — ${user.title}` : user.name;
+    const fullName = [user.name, user.surname].filter(Boolean).join(' ');
+    const title = user.title ? `${fullName} — ${user.title}` : fullName;
     const description =
       user.bio ??
-      `Portfolio of ${user.name}${user.title ? `, ${user.title}` : ''}.`;
+      `Portfolio of ${fullName}${user.title ? `, ${user.title}` : ''}.`;
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? '';
+
     return {
       title,
       description,
-      openGraph: { title, description },
-      twitter: { title, description },
+      alternates: { canonical: siteUrl || '/' },
+      openGraph: {
+        title,
+        description,
+        type: 'profile',
+        ...(user.name && { firstName: user.name }),
+        ...(user.surname && { lastName: user.surname }),
+        ...(user.nickname && { username: user.nickname }),
+        ...(siteUrl && { url: siteUrl }),
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+      },
     };
   } catch {
     return {};
@@ -52,8 +70,27 @@ export default async function Home() {
     );
   }
 
+  const fullName = [user.name, user.surname].filter(Boolean).join(' ');
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? '';
+  const sameAs = [user.github, user.linkedin, user.instagram].filter(Boolean);
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: fullName,
+    ...(user.title && { jobTitle: user.title }),
+    ...(user.bio && { description: user.bio }),
+    ...(user.email && { email: user.email }),
+    ...(siteUrl && { url: siteUrl }),
+    ...(sameAs.length > 0 && { sameAs }),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Navbar
         name={user.name}
         sections={

@@ -1,5 +1,22 @@
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
 
+/**
+ * Server-side fetch with Next.js ISR caching.
+ * Uses `next: { revalidate }` so the page is statically generated and
+ * refreshed in the background every `revalidate` seconds.
+ * Pass `revalidate = 0` for fully dynamic SSR (no cache).
+ */
+export async function serverGet<T>(
+  path: string,
+  revalidate: number = 3600,
+): Promise<T> {
+  const res = await fetch(`${API}${path}`, {
+    next: { revalidate },
+  });
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  return res.json() as Promise<T>;
+}
+
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('access_token');
