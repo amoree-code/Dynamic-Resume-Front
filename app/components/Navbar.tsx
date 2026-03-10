@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 
 const LINKS = [
   { href: '#about', label: 'about', section: 'about' },
-  { href: '#skills', label: 'skills', section: 'skills' },
-  { href: '#projects', label: 'projects', section: 'projects' },
   { href: '#experience', label: 'experience', section: 'experience' },
+  { href: '#projects', label: 'projects', section: 'projects' },
+  { href: '#skills', label: 'skills', section: 'skills' },
   { href: '#education', label: 'education', section: 'education' },
   { href: '#contact', label: 'contact', section: 'contact' },
 ];
