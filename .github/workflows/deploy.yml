@@ -31,8 +31,4 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             cd /var/www/dynamic-resume/frontend
-            git reset --hard
-            git pull origin main
-            pnpm install
-            pnpm run build
-            pm2 restart dynamic-resume-front
+            ./deploy.sh
