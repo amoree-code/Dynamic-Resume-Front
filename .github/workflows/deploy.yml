@@ -1,39 +1,41 @@
-name: Deploy Frontend
+name: Deploy Node.js App to VPS
 
 on:
   push:
     branches:
-      - main  # Trigger on pushes to main branch
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup pnpm
-        uses: [pnpm/action-setup@v4](https://github.com)
-        with:
-          version: 9 # Use a specific version, optional
-
-      - name: Set up Node.js
-        uses: [actions/setup-node@v4](https://github.com)
-        with:
-          node-version: 20
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile # Use pnpm install instead of npm install -g pnpm
-
       - name: Deploy to VPS via SSH
-        uses: [appleboy/ssh-action@v0.1.9](https://github.com)
+        uses: appleboy/ssh-action@v0.1.9
         with:
-          host: ${{ secrets.VPS_HOST }}
+          host: ${{ secrets.VPS_IP }}
+          key: ${{ secrets.VPS_SSH_KEY }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_KEY }}
-          port: ${{ secrets.VPS_PORT }}
+          port: 22
           script: |
-            cd /var/www/dynamic-resume/frontend
-            ./deploy.sh
+            # Navigate to project directory
+              cd /var/www/dynamic-resume/backend
+
+               # Check if pnpm is installed
+                      if ! command -v pnpm &> /dev/null
+                      then
+                          echo "pnpm not found, installing..."
+                          npm install -g pnpm
+                      else
+                          echo "pnpm is already installed"
+                      fi
+
+                      # Deployment steps
+                      git fetch origin main
+                      git reset --hard origin/main
+                      git clean -fd
+                      pnpm install
+                      pnpm build
