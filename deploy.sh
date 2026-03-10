@@ -3,8 +3,12 @@
 # Navigate to the frontend folder
 cd /var/www/dynamic-resume/frontend || exit
 
-# Ensure pnpm is in PATH
-export PATH=$PATH:/usr/local/bin/pnpm
+# Source nvm if available (needed when running via SSH non-login shell)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# Add common pnpm install locations to PATH
+export PATH="$HOME/.local/share/pnpm:$PATH:/usr/local/bin"
 
 # Reset local changes
 git reset --hard

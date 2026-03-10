@@ -1,4 +1,4 @@
-name: Deploy Node.js App to VPS
+name: Deploy Frontend
 
 on:
   push:
@@ -10,32 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v0.1.9
         with:
-          host: ${{ secrets.VPS_IP }}
-          key: ${{ secrets.VPS_SSH_KEY }}
+          host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          port: 22
+          key: ${{ secrets.VPS_KEY }}
+          port: ${{ secrets.VPS_PORT }}
           script: |
-            # Navigate to project directory
-              cd /var/www/dynamic-resume/backend
-
-               # Check if pnpm is installed
-                      if ! command -v pnpm &> /dev/null
-                      then
-                          echo "pnpm not found, installing..."
-                          npm install -g pnpm
-                      else
-                          echo "pnpm is already installed"
-                      fi
-
-                      # Deployment steps
-                      git fetch origin main
-                      git reset --hard origin/main
-                      git clean -fd
-                      pnpm install
-                      pnpm build
+            cd /var/www/dynamic-resume/frontend
+            git reset --hard
+            git pull origin main
+            bash deploy.sh
