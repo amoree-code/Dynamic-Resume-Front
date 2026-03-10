@@ -13,17 +13,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Setup pnpm
+        uses: [pnpm/action-setup@v4](https://github.com)
+        with:
+          version: 9 # Use a specific version, optional
+
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: [actions/setup-node@v4](https://github.com)
         with:
           node-version: 20
           cache: 'pnpm'
 
-      - name: Install pnpm
-        run: npm install -g pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile # Use pnpm install instead of npm install -g pnpm
 
       - name: Deploy to VPS via SSH
-        uses: appleboy/ssh-action@v0.1.9
+        uses: [appleboy/ssh-action@v0.1.9](https://github.com)
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
